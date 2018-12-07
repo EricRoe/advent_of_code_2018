@@ -1,56 +1,46 @@
+from collections import defaultdict
+
+with open('./input.txt') as f:
+    data = [line.split(', ') for line in f]
+    data = [(int(t[0]), int(t[1]), i) for i, t in enumerate(data)]
+
+
 def dist(p, x, y):
     return abs(p[0]-x) + abs(p[1]-y)
 
-fieldsize = 400
-padding = 0
-distance = 10000
-
-with open('./input.txt') as f:
-    d = [line.split(', ') for line in f]
-    d = [(int(l[0])+padding, int(l[1])+padding) for l in d]
-
-    d = [(d[i][0], d[i][1], i) for i in range(len(d))]
-
-
-field = [[None for y in range(fieldsize)] for x in range(fieldsize)]
-
-for p in d:
-    for y in range(len(field)):
-        for x in range(len(field[0])):
-            if field[x][y] is None:
-                field[x][y] = dist(p, x, y)
-            else:
-                field[x][y] += dist(p, x, y)
+def closest(x,y):
+    close = (1e5, -1) # distance, id
+    for p in data:
+        if dist(p, x, y) < close[0]:
+            close= (dist(p, x, y), p[2])
+        elif dist(p,x,y) == close[0]:
+            return -1
+    return close[1]
 
 
-
-           # if field[x][y] is None or dist(p, x, y) < field[x][y][0]:
-           #     field[x][y] = (dist(p, x, y), p[2])
-           # elif dist(p, x, y) == field[x][y][0]:
-           #     field[x][y] = (dist(p,x,y), -1)
-
-    print(p)
-
-
-#pv = dict((p, sum(p[2] == y[1] for x in field for y in x)) for p in d)
-#
-#l = sorted([(p[0][2], p[1]) for p in pv.items()], key = lambda t: t[1])
-#for i in l:
-    #print(i)
-#
-#
-#inf = {p[1] for p in field[0]}
-#inf.update(p[1] for p in field[-1])
-#inf.update(r[0][1] for r in field)
-#inf.update(r[-1][1] for r in field)
-#print()
-#print(inf)
-#print()
-#
-#for i in l:
-    #if i[0] not in inf:
-        #print(i)
+c = defaultdict(int)
+pts = dict()
+xmin = min(d[0] for d in data)
+xmax = max(d[0] for d in data)
+ymin = min(d[1] for d in data)
+ymax = max(d[1] for d in data)
 
 
-print(sum(y < distance for x in field for y in x))
+for x in range(xmin, xmax+1):
+    for y in range(ymin, ymax+1):
+        close = closest(x,y) 
+        c[close] += 1
+#        pts[(x,y)] = close
+
+inf_pts = {-1}
+for x in range(xmin, xmax+1):
+    for y in [ymin, ymax+1]:
+        inf_pts.add(closest(x,y))
+
+for y in range(ymin, ymax+1):
+    for x in [xmin, xmax+1]:
+        inf_pts.add(closest(x,y))
+
+print(max((i for i in c.items() if i[0] not in inf_pts), key = lambda t: t[1])[1])
+
 
