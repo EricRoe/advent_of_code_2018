@@ -1,19 +1,16 @@
+import re
+
 def pos(p):
     return (p[0] + t * p[2], p[1] + t * p[3]) # x,y
 
 with open('./input.txt') as f:
-    data = [line for line in f]
-
-d = [(int(l[l.index('<')+1:l.index(',')]), int(l[18:24].strip()), int(l[36:38]), int(l[40:42])) for l in data]
-
-# uncomment to parse test input.  Needs regex refactoring :P
-#d = [(int(l[l.index('<')+1:l.index(',')]), int(l[14:16].strip()), int(l[28:30]), int(l[32:34])) for l in data]
+    d = [list(map(int, re.findall(r'[-\d]+', line))) for line in f]
 
 # Tweak to find solution. 
 # Bump t to help zero in on the solution
 # Size controls the bounding box. Print grid only when it fits inside
 t = 0
-size = 10
+size = 120
 log_interval = 1000
 
 while True:
@@ -42,6 +39,7 @@ while True:
                 
         for row in grid:
             print(''.join(row))
+        input()
 
     t += 1
 
