@@ -1,6 +1,3 @@
-import re
-from collections import *
-
 with open('./input.txt') as f:
     d = [l.strip() for l in f]
 
@@ -9,7 +6,7 @@ I = d[1:796*4:4]
 A = d[2:796*4:4]
 
 B = [[int(s[0][-1]), int(s[1]), int(s[2]), int(s[3][1])] for s in [r.split(',') for r in B]]
-I = [list(map(int, s)) for s in [r.split() for r in I]]
+I = [(int(s[0]), int(s[1]), int(s[2]), int(s[3])) for s in [r.split() for r in I]]
 A = [[int(s[0][-1]), int(s[1]), int(s[2]), int(s[3][1])] for s in [r.split(',') for r in A]]
 
 d = d[796*4+2:]
@@ -83,6 +80,7 @@ def eqrr(a,b,c,r):
 instructions = [addr, addi, bori, banr, bani, setr, seti, gtir, gtri, borr, gtrr, mulr, eqir, muli, eqri, eqrr]
 
 
+#Part One
 total = 0
 for i in range(len(B)):
     ti = 0
@@ -90,7 +88,7 @@ for i in range(len(B)):
         b = B[i]
         ii = I[i]
         a = A[i]
-        r = inst(*I[i][1:].copy(), B[i].copy())
+        r = inst(*I[i][1:], B[i].copy())
 
         eq = [exp == act for exp, act in zip(a, r)]
 
@@ -102,37 +100,38 @@ for i in range(len(B)):
 print(total)
 
 
-rem = [i for i,v in enumerate(I) if v[0] in [2, 13, 11, 9, 10, 15, 6, 0, 1, 12, 14, 8, 5, 4, 3, 7]]
-rem.sort(reverse=True)
+#Part Two
+found = {}
+while len(found) < 16:
+    for i in range(len(B)):
+        ti = []
+        for f in instructions:
+            b = B[i]
+            ii = I[i]
+            a = A[i]
+            r = f(*I[i][1:], B[i].copy())
 
-for i in rem:
-    B.pop(i)
-    I.pop(i)
-    A.pop(i)
+            eq = all(exp == act for exp, act in zip(a, r))
 
+            if eq:
+                ti.append((ii, f))
 
-for i in range(len(B)):
-    ti = []
-    for inst in instructions:
-        b = B[i]
-        ii = I[i]
-        a = A[i]
-        r = inst(*I[i][1:].copy(), B[i].copy())
+        if len(ti) == 1:
+            found[ti[0][0][0]] = ti[0][1]
+            instructions.remove(ti[0][1])
 
-        eq = all(exp == act for exp, act in zip(a, r))
+    remove = [i for i,v in enumerate(I) if v[0] in found.keys()]
+    remove.sort(reverse=True)
 
-        if eq:
-            ti.append((inst, ii))
-
-    if len(ti) == 1:
-        print(ti)
-
-instructions = [gtir, setr, bori, gtrr, gtri, eqir, seti, eqri, eqrr, borr, addr, mulr, bani, muli, banr, addi]
+    for i in remove:
+        B.pop(i)
+        I.pop(i)
+        A.pop(i)
 
 
 r = [0, 0, 0, 0]
 for i in d:
-    r = instructions[i[0]](*i[1:], r)
-print(r)
+    r = found[i[0]](*i[1:], r)
+print(r[0])
 
 
