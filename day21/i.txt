@@ -1,0 +1,75 @@
+#ip 4
+
+r0, r1, r2, r3, r4, r5
+
+
+r1 = 123
+0  seti 123 0 1
+
+r1 = r1 & 72
+1  bani 1 456 1
+
+r1 = r1 == 72
+2  eqri 1 72 1
+
+ip = r1 + 3
+3  addr 1 4 4
+
+GOTO 0
+4  seti 0 0 4
+5  seti 0 3 1        # r1 = 0
+
+
+
+6  bori 1 65536 5    # r5 = r1 | 65536
+7  seti 8586263 3 1  # r1 = 8586263
+
+8  bani 5 255 2      # r2 = r5 % 256
+9  addr 1 2 1        # r1 = ((r1 + r2) * 65899) % 16777216
+10 bani 1 16777215 1 #
+11 muli 1 65899 1    #
+12 bani 1 16777215 1 #
+
+13 gtir 256 5 2      #
+14 addr 2 4 4        # 256 > r5 ? GOTO 28 : GOTO 17
+15 addi 4 1 4        #
+16 seti 27 8 4       #
+17 seti 0 1 2        # 
+
+18 addi 2 1 3        #
+19 muli 3 256 3      #
+20 gtrr 3 5 3        # 
+21 addr 3 4 4        # (r2 + 1) * 256 > r5 ? GOTO 26 : GOTO 24
+22 addi 4 1 4        #
+23 seti 25 8 4       #
+
+24 addi 2 1 2        # r2 = r2 + 1
+25 seti 17 7 4       # GOTO 18
+
+26 setr 2 0 5        # r5 = r2
+27 seti 7 8 4        # GOTO 8
+
+28 eqrr 1 0 2        # 
+29 addr 2 4 4        # r1 == r0 ? END : GOTO 6
+30 seti 5 4 4        #
+
+
+while True:
+    if six:
+        r5 = r1 | 65536
+        r1 = 858263
+        six = False
+
+    r2 = r5 % 256
+    r1 = ((r1 + r2) * 65899) % 16777216
+
+    if 256 > r5:
+      if r1 == r0:
+        break
+      six = True
+      continue
+
+    while (r2 + 1) * 256 > r5:
+        r2 += 1
+    r5 = r2
+      
